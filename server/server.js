@@ -24,6 +24,14 @@ app.post("/todos",(req,res)=>{       //hhtp post method to colloect user input
   });
 });
 
+app.get("/todos",(req,res)=>{
+  Todo.find({}).then((todos)=>{
+     res.send({todos});
+  },(err)=>{
+    res.status(400).send(err);
+  });
+});
+
 app.listen(3000,()=>{
   console.log("Server started on port 3000");
 });
