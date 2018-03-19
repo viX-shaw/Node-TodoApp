@@ -13,7 +13,7 @@ app.post("/todos",(req,res)=>{       //hhtp post method to colloect user input
  if(req.body.text === undefined){
    req.body.text = "";
  }
-  var todo =new Todo({                //creating a new instance from mongoose model //:
+  var todo =new Todo({                //creatin a new instance from mongoose model //:
     text:req.body.text
   });
 
