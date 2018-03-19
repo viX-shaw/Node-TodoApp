@@ -10,6 +10,9 @@ var app = express();
 app.use(bodyParser.json());
 
 app.post("/todos",(req,res)=>{       //hhtp post method to colloect user input
+ if(req.body.text === undefined){
+   req.body.text = "";
+ }
   var todo =new Todo({                //creating a new instance from mongoose model //:
     text:req.body.text
   });
@@ -24,3 +27,5 @@ app.post("/todos",(req,res)=>{       //hhtp post method to colloect user input
 app.listen(3000,()=>{
   console.log("Server started on port 3000");
 });
+
+module.exports = {app};
