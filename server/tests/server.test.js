@@ -4,10 +4,19 @@ const request = require("supertest");
 var {Todo} = require("./../models/Todo");
 var {app} = require("./../server");
 
-beforeEach((done)=>{
-  Todo.remove({}).then(()=>{
-    done();
-  });
+var todos = [
+   {
+     text:"mock data"
+   },{
+     text:"mock data 1"
+   }
+]
+
+beforeEach(function(done){
+  this.timeout(5000);                   //even with done the linit is 2s therefore
+  Todo.remove({}).then(()=>{            //increase the waiting time forcefully
+      return Todo.insertMany(todos);
+  }).then(()=>done());
 });
 describe("POST Todo",()=>{
 
@@ -25,7 +34,7 @@ describe("POST Todo",()=>{
             return done(err);             // and be "done" with it
           }
 
-          Todo.find({}).then((docs)=>{      //Also checking the collection
+          Todo.find({text}).then((docs)=>{      //Also checking the collection
             expect(docs.length).toBe(1);   //only contains 1 entry
             expect(docs[0].text).toBe(text);//and that is equal to the mock value
             done();
@@ -44,10 +53,21 @@ describe("POST Todo",()=>{
          }
 
          Todo.find({}).then((todos)=>{
-           expect(todos.length).toBe(0);
+           expect(todos.length).toBe(2);
            done();
          }).catch((e)=>done(e));
        });
    });
-
 });
+
+describe("GET /todos",()=>{
+  it("should get all todos ",(done)=>{
+    request(app)
+      .get("/todos")
+      .expect(200)
+      .expect((res)=>{
+        expect(res.body.todos.length).toBe(2);
+      })
+      .end(done);
+  });
+});///
