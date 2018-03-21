@@ -1,5 +1,6 @@
 var express = require("express");
 var bodyParser=require("body-parser");
+var {ObjectID} = require("mongodb");
 
 var {mongoose} = require("./db/mongoose");   //it will run the connect and export statements
 var {Todo} = require("./models/Todo");
@@ -29,6 +30,25 @@ app.get("/todos",(req,res)=>{
      res.send({todos});
   },(err)=>{
     res.status(400).send(err);
+  });
+});
+
+app.get("/todos/:id",(req,res)=>{   //requesting a particular entry in the DB
+  var id = req.params.id;
+  if(!ObjectID.isValid(id)){
+   return res.status(404).send();
+  //  return res.status(404).send("Invalid id");         //Checking the validity of id var
+  }
+  Todo.findById(id).then((todo)=>{
+    if(todo === null)
+    {
+      return res.status(404).send()
+      // return res.status(404).send("No matching todo")
+    }
+    res.send(todo);
+  },(err)=>{
+    console.log(err);
+    res.status(400).send();
   });
 });
 
