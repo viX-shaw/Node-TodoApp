@@ -1,19 +1,22 @@
 const expect = require("expect");
 const request = require("supertest");
+const {ObjectID} = require("mongodb");
 
 var {Todo} = require("./../models/Todo");
 var {app} = require("./../server");
 
 var todos = [
    {
+     _id: new ObjectID(),
      text:"mock data"
    },{
+     _id: new ObjectID(),
      text:"mock data 1"
    }
 ]
 
 beforeEach(function(done){
-  this.timeout(5000);                   //even with done the linit is 2s therefore
+  this.timeout(5000);                   //even with "done" the limit is 2s therefore
   Todo.remove({}).then(()=>{            //increase the waiting time forcefully
       return Todo.insertMany(todos);
   }).then(()=>done());
@@ -70,4 +73,30 @@ describe("GET /todos",()=>{
       })
       .end(done);
   });
-});///
+});
+
+describe("GET /todos/:id",()=>{
+  it("should return a todo doc",(done)=>{
+    request(app)
+    .get(`/todos/${todos[0]._id.toHexString()}`)
+    .expect(200)
+    .expect((res)=>{
+      expect(res.body.text).toBe(todos[0].text)
+    })
+    .end(done);
+  });
+
+  it("should return a 404 if todo not found",(done)=>{
+    request(app)
+    .get(`/todos/${new ObjectID().toHexString()}`)
+    .expect(404)
+    .end(done);
+  });
+
+  it("should return a 404 if non-object id is found",(done)=>{
+    request(app)
+    .get(`/todos/123`)
+    .expect(404)
+    .end(done);
+  });
+});
