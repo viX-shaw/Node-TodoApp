@@ -20,7 +20,7 @@ var todos = [
 beforeEach(function(done){
   this.timeout(5000);                   //even with "done" the limit is 2s therefore
   Todo.remove({}).then(()=>{            //increase the waiting time forcefully
-      return Todo.insertMany(todos);
+      return Todo.insertMany(todos);    //
   }).then(()=>done());
 });
 describe("POST Todo",()=>{
@@ -150,6 +150,7 @@ describe("PATCH /todos/:id",()=>{
      })
      .expect(200)
      .expect((res)=>{
+       
        expect(res.body.todo.text).toBe("mock data 2");
        expect(res.body.todo.completed).toBe(true);
        expect(res.body.todo.completedAt).toBeDefined();
