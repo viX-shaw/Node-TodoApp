@@ -1,3 +1,5 @@
+require("./config/config");
+
 const express = require("express");
 const bodyParser=require("body-parser");
 const {ObjectID} = require("mongodb");
@@ -8,7 +10,7 @@ var {Todo} = require("./models/Todo");
 var {User} = require("./models/User");
 
 var app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
@@ -75,7 +77,7 @@ app.delete("/todos/:id",(req,res)=>{
 app.patch("/todos/:id",(req,res)=>{
   var id = req.params.id;
   var body = lodash.pick(req.body ,["text","completed"]);
-  console.log(body);
+  //console.log(body);
 
   if(!ObjectID.isValid(id)){
     return res.status(404).send();
