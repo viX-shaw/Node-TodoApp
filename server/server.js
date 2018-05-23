@@ -15,12 +15,13 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
-app.post("/todos",(req,res)=>{       //hhtp post method to colloect user input
+app.post("/todos", authenticate, (req,res)=>{       //hhtp post method to colloect user input
  if(req.body.text === undefined){
    req.body.text = "";
  }
   var todo =new Todo({                //creatin a new instance from mongoose model //:
-    text:req.body.text
+    text:req.body.text,
+    _creator: req.user._id
   });
 
   todo.save().then((doc)=>{
@@ -30,21 +31,26 @@ app.post("/todos",(req,res)=>{       //hhtp post method to colloect user input
   });
 });
 
-app.get("/todos",(req,res)=>{
-  Todo.find({}).then((todos)=>{
+app.get("/todos", authenticate, (req,res)=>{
+  Todo.find({
+    _creator: req.user._id
+  }).then((todos)=>{
      res.send({todos});
   },(err)=>{
     res.status(400).send(err);
   });
 });
 
-app.get("/todos/:id",(req,res)=>{   //requesting a particular entry in the DB
+app.get("/todos/:id", authenticate, (req,res)=>{   //requesting a particular entry in the DB
   var id = req.params.id;
   if(!ObjectID.isValid(id)){
    return res.status(404).send();
   //  return res.status(404).send("Invalid id");         //Checking the validity of id var
   }
-  Todo.findById(id).then((todo)=>{
+  Todo.findOne({
+    _id: id,
+    _creator: req.user._id
+  }).then((todo)=>{
     if(todo === null)
     {
       return res.status(404).send()
@@ -57,13 +63,16 @@ app.get("/todos/:id",(req,res)=>{   //requesting a particular entry in the DB
   });
 });
 
-app.delete("/todos/:id",(req,res)=>{
+app.delete("/todos/:id",authenticate, (req,res)=>{
   var id = req.params.id;
   if(!ObjectID.isValid(id)){
     return res.status(404).send();
   }
 
-  Todo.findByIdAndRemove(id).then((todo)=>{
+  Todo.findOneAndRemove({
+    _id: id,
+    _creator: req.user._id
+  }).then((todo)=>{
     if(todo === null)
     {
       return res.status(404).send();
@@ -75,7 +84,7 @@ app.delete("/todos/:id",(req,res)=>{
   });
 });
 
-app.patch("/todos/:id",(req,res)=>{
+app.patch("/todos/:id", authenticate, (req,res)=>{
   var id = req.params.id;
   var body = lodash.pick(req.body ,["text","completed"]);
   //console.log(body);
@@ -91,7 +100,10 @@ app.patch("/todos/:id",(req,res)=>{
     body.completedAt = null;
   }
 
-  Todo.findByIdAndUpdate(id,{$set :body},{new : true}).then((todo)=>{
+  Todo.findOneAndUpdate({
+    _id: id,
+    _creator: req.user._id
+  },{$set :body},{new : true}).then((todo)=>{
     if(todo === null){
       res.status(404).send();
     }

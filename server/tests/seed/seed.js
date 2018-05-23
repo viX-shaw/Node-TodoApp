@@ -17,18 +17,24 @@ var users = [{
 },{
   _id :userTwoId,
   email : "ben@example.com",
-  password : "123qwe"
+  password : "123qwe",
+  tokens: [{
+    access: "auth",
+    token : jwt.sign({_id: userTwoId.toHexString() , access: "auth"}, "123abc").toString()
+  }]
 }];
 
 var todos = [
    {
      _id: new ObjectID(),
-     text:"mock data"
+     text:"mock data",
+     _creator: userOneId
    },{
      _id: new ObjectID(),
      text:"mock data 1",
      completed: true,
-     completedAt: 1234
+     completedAt: 1234,
+     _creator: userTwoId
    }
 ]
 
