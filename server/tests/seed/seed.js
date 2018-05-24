@@ -12,7 +12,7 @@ var users = [{
   password: "and123",
   tokens: [{
     access: "auth",
-    token : jwt.sign({_id: userOneId.toHexString() , access: "auth"}, "123abc").toString()
+    token : jwt.sign({_id: userOneId.toHexString() , access: "auth"}, process.env.JWT_SECRET).toString()
   }]
 },{
   _id :userTwoId,
@@ -20,7 +20,7 @@ var users = [{
   password : "123qwe",
   tokens: [{
     access: "auth",
-    token : jwt.sign({_id: userTwoId.toHexString() , access: "auth"}, "123abc").toString()
+    token : jwt.sign({_id: userTwoId.toHexString() , access: "auth"}, process.env.JWT_SECRET).toString()
   }]
 }];
 
